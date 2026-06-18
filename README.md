@@ -1,6 +1,8 @@
 # Bruteforce Search for Popular Outcomes in a 2D Euclidean Roommates Game
 
-A pyscript based application that allows you to manually or randomly generate an instance of the 2-Dimensional Euclidean Roommates Problem and generates all popular outcomes by brute force. We provide some instances with interesting properties
+A pyscript based application that allows you to manually or randomly generate an instance of the 2-Dimensional Euclidean Roommates Problem and generates all popular outcomes by brute force. The purpose of this application is to use the instances of the 2-Dimensional Euclidean Roommates Problem with their corresponding popular outcomes to potentially find a structure that allows us to create a polynomial time algorithm or help us construct a harness proof.
+
+We provide some instances with interesting properties.
 
 ## No Popular Outcome in 2D
 Room Size: 3
