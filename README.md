@@ -4,6 +4,7 @@ A pyscript based application that allows you to manually or randomly generate an
 
 ## No Popular Outcome in 2D
 Room Size: 3
+
 {0: [-2, 0],
  1: [-1, 1],
  2: [1, 1],
@@ -18,6 +19,7 @@ Room Size: 3
 A pair with the smallest overall distance is not guaranteed to be in a popular outcome.
 
 Room size: 2
+
 {
     0: [-1, -5],
     1: [-1, -3],
@@ -31,6 +33,7 @@ Room size: 2
 
 ## In 1D consecutive matching (minimum sum of distances) is not guaranteed to be popular
 Room size: 2
+
 {
     0: [0, 0],
     1: [4, 0],
