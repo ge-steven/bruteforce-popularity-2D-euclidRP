@@ -1,0 +1,4 @@
+{
+    "packages": ["matplotlib", "more_itertools"]
+}
+

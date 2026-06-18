@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Bruteforce Popularity 2D Euclidean Roommates</title>
+      <link rel="stylesheet" href="https://pyscript.net/releases/2026.6.1/core.css">
+      <script type="module" src="https://pyscript.net/releases/2026.6.1/core.js"></script>
+        <link rel="stylesheet" href="style.css">
+
+  </head>
+  <body>
+    <h1>Bruteforce Popular Outcome Computation for 2D Euclidean Roommates</h1>
+    <div id="error-output" style="color: red; font-weight: bold;"></div>
+    <div class="grid">
+      <div class="panel">
+        <h1>Initialize Roommate Game</h1>
+        <h2>General</h2>
+        <h5>Room Size</h5>
+        <input style="height: 1em; width: 10%;" type="text" id="room-size" value="3"><br><br>
+        <h3>Manual</h3>
+        <h5>Points</h5>
+        <textarea style="height: 10em; width: 100%;" type="text" id="input">
+{0: [-5.9, 0.0],
+1: [-2.8, 4.7],
+2: [-1.9, 3.5],
+3: [3.9, 0.4],
+4: [5.4, -5.6],
+5: [5.5, 7.2],
+6: [5.8, 1.6],
+7: [7.8, -9.0],
+8: [9.5, -2.3]}
+        </textarea>
+        <button id="manual-button">Manual</button><br><br>
+        <h3>Random</h3>
+        <h5>Maximum Coordinate Values</h5>
+        X: <input style="height: 1em; width: 10%;" type="text" id="max-x" value="10">
+        Y: <input style="height: 1em; width: 10%;" type="text" id="max-y" value="10">
+        <h5>Minimum Coordinate Values</h5>
+        X: <input style="height: 1em; width: 10%;" type="text" id="min-x" value="-10">
+        Y: <input style="height: 1em; width: 10%;" type="text" id="min-y" value="-10">
+        <h5>Number of Agents</h5>
+        <input style="height: 1em; width: 10%;" type="text" id="number-of-agents" value="9"><br><br>
+        <button id="random-button">Random</button>
+      </div>
+
+
+      <div class="panel">
+        <h1>Roommate Game Plot</h1>
+        <div style="min-width: 95%;" id="input-plot-output" class="output"></div><br><br>
+        <h2>Coordinates</h2>
+        <div id="output"></div>
+      </div>
+
+
+      <div class="panel">
+        <h1>Generate Popular outcomes</h1>
+        <button id="btn-plot">Generate</button><br><br>
+        <h2>Popular outcome plots</h2>
+        <div id="plot-output" class="output"></div><br><br>
+        <h2>Popular outcomes</h2>
+        <div id="output-popular-outcomes"></div>
+      </div>
+    </div>
+    *When the room size is 2 and all y-coordinates are 0, line intersections are avoided when drawing the popular outcomes.
+
+    <script type="py" src="./main.py" config="./pyscript.json"></script>
+  </body>
+</html>
