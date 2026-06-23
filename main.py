@@ -274,6 +274,7 @@ def plot_input_random(event):
     """
     Plot input points
     """
+
     settings["initialized"] = True
     settings["already-computed"] = False
     web.page["error-output"].innerText = ""
@@ -310,6 +311,10 @@ def plot_input_random(event):
 
     display(df, target="agent-coordinates-output", append=False)
 
+    output = web.page["agent-coordinates-output-raw"]
+    output.innerText = ""
+    output.innerText = str(settings["agentsCoordinates"])
+
 @when("click", "#manual-button")
 def plot_input_manual(event):
     """
@@ -344,6 +349,10 @@ def plot_input_manual(event):
     df.index.name = "Agent"
 
     display(df, target="agent-coordinates-output", append=False)
+    
+    output = web.page["agent-coordinates-output-raw"]
+    output.innerText = ""
+    output.innerText = str(settings["agentsCoordinates"])
 
 
 @when("click", "#btn-plot")
@@ -353,6 +362,9 @@ def show_matplotlib_plot(event):
     """
     if settings["initialized"]:
         if settings["valid"]:
+            output = web.page["output-popular-outcomes-raw"]
+            output.innerText = ""
+
             # Compute all possible outcomes and find the popular ones
             if not settings["already-computed"]:
                 settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
@@ -391,6 +403,9 @@ def show_matplotlib_plot(event):
                 df.index.name = "Outcome"
                 display(df, target="output-popular-outcomes", append=False)
 
+
+                output.innerText = "[" + ",\n".join(map(str, popoutcomes)) + "]"
+
     else:
         web.page["error-output"].innerText = "Roommate Game not initialized"
 
@@ -402,6 +417,10 @@ def find_more_popular_outcome(event):
     """
     if settings["initialized"]:
         if settings["valid"]:
+            output = web.page["more-popular-output-raw"]
+            output.innerText = ""
+
+
             # Compute all possible outcomes and find the popular ones
             if not settings["already-computed"]:
                 settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
@@ -431,6 +450,7 @@ def find_more_popular_outcome(event):
                 )
                 df.index.name = "Outcome"
                 display(df, target="more-popular-output", append=False)
+                output.innerText = "[" + ",\n".join(map(str, morepopoutcomes)) + "]"
 
     else:
         web.page["error-output"].innerText = "Roommate Game not initialized"
