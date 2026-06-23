@@ -22,11 +22,11 @@
         <h1>Initialize Roommate Game</h1>
         <h2>General</h2>
         <h5>Room Size</h5>
-        <input style="height: 1em; width: 10%;" type="text" id="room-size" value="3">
+        <input style="min-height: 1em; width: 10%;" type="text" id="room-size" value="3">
         <br><br>
         <h2>Manual</h2>
         <h5>Points</h5>
-        <textarea style="height: 10em; width: 100%;" type="text" id="input">
+        <textarea style="min-height: 10em; width: 100%;" type="text" id="input">
 {0: [-5.9, 0.0],
 1: [-2.8, 4.7],
 2: [-1.9, 3.5],
@@ -41,13 +41,13 @@
         <br><br>
         <h2>Random</h2>
         <h5>Maximum Coordinate Values</h5>
-        X: <input style="height: 1em; width: 10%;" type="text" id="max-x" value="10">
-        Y: <input style="height: 1em; width: 10%;" type="text" id="max-y" value="10">
+        X: <input style="min-height: 1em; width: 10%;" type="text" id="max-x" value="10">
+        Y: <input style="min-height: 1em; width: 10%;" type="text" id="max-y" value="10">
         <h5>Minimum Coordinate Values</h5>
-        X: <input style="height: 1em; width: 10%;" type="text" id="min-x" value="-10">
-        Y: <input style="height: 1em; width: 10%;" type="text" id="min-y" value="-10">
+        X: <input style="min-height: 1em; width: 10%;" type="text" id="min-x" value="-10">
+        Y: <input style="min-height: 1em; width: 10%;" type="text" id="min-y" value="-10">
         <h5>Number of Agents</h5>
-        <input style="height: 1em; width: 10%;" type="text" id="number-of-agents" value="9">
+        <input style="min-height: 1em; width: 10%;" type="text" id="number-of-agents" value="9">
         <br><br>
         <button id="random-button">Set Randomly</button>
       </div>
@@ -89,7 +89,7 @@
         <button id="find-morepop-button">Find More Popular</button>
         <br><br>
         <h2>Input Outcome</h2>
-        <textarea style="height: 10em; width: 100%;" type="text" id="manual-outcome-more-popularinput">
+        <textarea style="min-height: 10em; width: 100%;" type="text" id="manual-outcome-more-popularinput">
 [
 [0, 1, 2],
 [3, 4, 5],
@@ -111,7 +111,7 @@
       <div class="panel">
         <h1>Plot Outcomes Manually</h1>
         <h2>Input Outcomes</h2>
-        <textarea style="height: 10em; width: 100%;" type="text" id="manual-outcome-input">
+        <textarea style="min-height: 10em; width: 100%;" type="text" id="manual-outcome-input">
 [
 [[0, 1, 2],
 [3, 4, 5],
@@ -136,6 +136,38 @@
         <br><br>
         <h2>Distance Table</h2>
         <div id="manual-distance-output"  class="output"></div>
+      </div>
+
+    </div>
+
+    <div class="grid">
+
+
+      <div class="panel">
+        <h1>Compute Popularity Margin</h1>
+        <div>
+          <div style="min-height: 10em; width: 50%; float:left">
+            <h2>Outcome 1</h2>
+            <textarea style="min-height: 10em; width: 100%;" type="text" id="popmargin-outcome1-input">
+  [[0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8]]
+            </textarea>
+          </div>
+          <div style="min-height: 10em; width: 50%; float:right">
+            <h2>Outcome 2</h2>
+            <textarea style="min-height: 10em; width: 100%;" type="text" id="popmargin-outcome2-input">
+  [[0, 2, 4],
+  [1, 3, 5],
+  [6, 7, 8]]
+            </textarea>
+          </div>
+        </div>
+        <br><br>
+        <button id="popularity-margin-button">Compute</button>
+        <br><br>
+        <h2>Popularity Margin N(outcome1, outcome2)</h2>
+        <div id="popularity-margin-output"  class="output"></div>
       </div>
 
     </div>

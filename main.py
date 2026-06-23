@@ -237,6 +237,18 @@ def outcomeAgentsRank(outcome, agentCoordinates):
         result.append(outcomeAgentRank(outcome, agent, agentCoordinates))
     return result
 
+def N_aux(outcome1, outcome2, agentCoordinates):
+    result = []
+    agents = range(settings["nrAgents"])
+    for agent in agents:
+        outcome1room = [sublist for sublist in outcome1 if agent in sublist][0]
+        outcome2room = [sublist for sublist in outcome2 if agent in sublist][0]
+
+        if distanceAgentRoom(agent, outcome1room, agentCoordinates) < distanceAgentRoom(agent, outcome2room, agentCoordinates):
+            result.append(agent)
+
+    return result
+
 
 settings = {
     "initialized": False,
@@ -491,20 +503,21 @@ def show_rank_table(event):
 
 
 
+@when("click", "#popularity-margin-button")
+def show_popmargin(event):
+    if settings["initialized"]:
+        output = web.page["popularity-margin-output"]
+        output.innerText = ""
 
+        input_text1 = web.page["popmargin-outcome1-input"]
+        input_text2 = web.page["popmargin-outcome2-input"]
 
+        outcome1 =  ast.literal_eval("\n".join(line.strip() for line in input_text1.value.splitlines()))
+        outcome2 =  ast.literal_eval("\n".join(line.strip() for line in input_text2.value.splitlines()))
+        
+        popmargin = N_aux(outcome1, outcome2, settings["agentsCoordinates"])
 
+        output.innerText = str(popmargin)
 
-
-
-
-
-    # if settings["valid"]:
-    #     # Compute all possible outcomes and find the popular ones
-    #     if not settings["already-computed"]:
-    #         settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
-    #         settings["outcomesAgentToRoomID"] = generateAgentsToRoomIdAllOutcomes(settings["outcomes"], range(settings["nrAgents"]))
-    #         settings["popoutcomesids"] = findPopularOutcomes(settings["outcomes"], settings["agentsCoordinates"], settings["outcomesAgentToRoomID"])
-    #         settings["already-computed"] = True
-
-    
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
