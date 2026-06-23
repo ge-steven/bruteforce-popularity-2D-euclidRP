@@ -1,4 +1,4 @@
 {
-    "packages": ["matplotlib", "more_itertools"]
+    "packages": ["matplotlib", "more_itertools", "pandas"]
 }
 

@@ -1,3 +1,4 @@
+import pandas as pd
 from pyscript import display, HTML, when, web
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
@@ -5,11 +6,9 @@ from matplotlib.patches import PathPatch
 import numpy as np
 import random
 import math
-from itertools import combinations
 import more_itertools
+import itertools
 import ast
-import textwrap
-import js
 
 # Computation functions
 def generateAgents(dimensions, n):
@@ -82,6 +81,14 @@ def isPopular(outcome1, outcomes, agentCoordinates, agentToRoomId1, agentToRoomI
             return False
     return True
         
+
+def findMorePopular(outcome1, outcomes, agentCoordinates, agentToRoomId1, agentToRoomId):
+    result = []
+    for i in range(len(outcomes)):
+        if (len(N(outcome1, outcomes[i], agentCoordinates, agentToRoomId1, agentToRoomId[i])) <
+            len(N(outcomes[i], outcome1, agentCoordinates, agentToRoomId[i],agentToRoomId1))):
+            result.append(outcomes[i])
+    return result
 
 def findPopularOutcomes(outcomes, agentCoordinates, agentToRoomId):
     popularIds = []
@@ -189,8 +196,51 @@ def is1d(agentsCoordinates):
             return False
     return True
 
+# Auxiliary functions
+
+def generateOutcomeAgentDistanceTable(outcomes):
+    outcomesAgentToRoomID = generateAgentsToRoomIdAllOutcomes(outcomes, range(settings["nrAgents"]))
+    
+    outcomeAgentDistanceTable = {}
+
+    for i in range(len(outcomes)):
+        outcomeAgentDistanceTable[i] = {}
+        for j in range(settings["nrAgents"]):
+            outcomeAgentDistanceTable[i][j] = distToRoom(outcomes[i], j, outcomesAgentToRoomID[i], settings["agentsCoordinates"])
+
+    return outcomeAgentDistanceTable
+
+def distanceAgentRoom(agent, room, agentCoordinates):
+    dist = 0
+    for a in room:
+        dist += math.dist(agentCoordinates[agent], agentCoordinates[a])
+    return dist
+
+def agentRoomRank(agent, room, agentCoordinates):
+    rank = 0
+    agents = set(range(settings["nrAgents"]))
+    rooms = [sublist for sublist in list(itertools.combinations(agents, settings["roomsize"])) if agent in sublist]
+    roomdist = distanceAgentRoom(agent, room, agentCoordinates)
+    
+    for r in rooms:
+        if distanceAgentRoom(agent, r, agentCoordinates) < roomdist:
+            rank += 1
+    return rank
+
+def outcomeAgentRank(outcome, agent, agentCoordinates):
+    room =  [sublist for sublist in outcome if agent in sublist][0]
+    return agentRoomRank(agent, room, agentCoordinates)
+
+def outcomeAgentsRank(outcome, agentCoordinates):
+    result = []
+    for agent in range(settings["nrAgents"]):
+        result.append(outcomeAgentRank(outcome, agent, agentCoordinates))
+    return result
+
 
 settings = {
+    "initialized": False,
+
     "dimensions": 2,
     "maxCoordinates": [],
     "minCoordinates": [],
@@ -198,7 +248,12 @@ settings = {
     "roomsize": -1,
     "nrRooms": -1,
     "agentsCoordinates": {},
-    "valid": True
+    "valid": True,
+    
+    "already-computed": False,
+    "outcomes": [],
+    "outcomesAgentToRoomID": {},
+    "popoutcomesids": []
 }
 
 
@@ -207,6 +262,8 @@ def plot_input_random(event):
     """
     Plot input points
     """
+    settings["initialized"] = True
+    settings["already-computed"] = False
     web.page["error-output"].innerText = ""
     settings["valid"] = True
     settings["roomsize"] = int(web.page["room-size"].value)
@@ -236,14 +293,18 @@ def plot_input_random(event):
     display(fig, target="input-plot-output")
     plt.close(fig)
 
-    output_div = web.page["output"]
-    output_div.innerText = settings["agentsCoordinates"]
+    df = pd.DataFrame.from_dict(settings["agentsCoordinates"], orient="index", columns=["x", "y"])
+    df.index.name = "Agent"
+
+    display(df, target="agent-coordinates-output", append=False)
 
 @when("click", "#manual-button")
 def plot_input_manual(event):
     """
     Plot input points
     """
+    settings["initialized"] = True
+    settings["already-computed"] = False
     web.page["error-output"].innerText = ""
     settings["valid"] = True
 
@@ -267,8 +328,10 @@ def plot_input_manual(event):
     display(fig, target="input-plot-output")
     plt.close(fig)
 
-    output_div = web.page["output"]
-    output_div.innerText = settings["agentsCoordinates"]
+    df = pd.DataFrame.from_dict(settings["agentsCoordinates"], orient="index", columns=["x", "y"])
+    df.index.name = "Agent"
+
+    display(df, target="agent-coordinates-output", append=False)
 
 
 @when("click", "#btn-plot")
@@ -276,34 +339,172 @@ def show_matplotlib_plot(event):
     """
     Display a single matplotlib plot.
     """
-    if settings["valid"]:
-        # Compute all possible outcomes and find the popular ones
-        outcomes = part(range(settings["nrAgents"]), settings["nrRooms"])
-        outcomesAgentToRoomID = generateAgentsToRoomIdAllOutcomes(outcomes, range(settings["nrAgents"]))
-        popoutcomesids = findPopularOutcomes(outcomes, settings["agentsCoordinates"], outcomesAgentToRoomID)
+    if settings["initialized"]:
+        if settings["valid"]:
+            # Compute all possible outcomes and find the popular ones
+            if not settings["already-computed"]:
+                settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
+                settings["outcomesAgentToRoomID"] = generateAgentsToRoomIdAllOutcomes(settings["outcomes"], range(settings["nrAgents"]))
+                settings["popoutcomesids"] = findPopularOutcomes(settings["outcomes"], settings["agentsCoordinates"], settings["outcomesAgentToRoomID"])
+                settings["already-computed"] = True
 
-        # Create the string for popular outcomes
-        popoutcomesstring = ""
-        for i in popoutcomesids:
-            popoutcomesstring += str(outcomes[i]) + "\n"
+            # Create the string for popular outcomes
+            popoutcomes = []
+            for i in settings["popoutcomesids"]:
+                popoutcomes.append(settings["outcomes"][i])
 
 
-        display(HTML("Popular Outcomes"),
-                target="plot-output", append=False)
-        
+            display(HTML("Popular Outcomes"),
+                    target="plot-output", append=False)
+            
+            if is1d(settings["agentsCoordinates"]) and settings["roomsize"] == 2:
+                for i in settings["popoutcomesids"]:
+                    fig = plotOutcome1DCurve(settings["outcomes"][i], settings["agentsCoordinates"], settings["nrAgents"])
+                    display(fig, target="plot-output")
+                    plt.close(fig)
+            else:
+                for i in settings["popoutcomesids"]:
+                    fig = plotOutcome(settings["outcomes"][i], settings["agentsCoordinates"], settings["nrAgents"])
+                    display(fig, target="plot-output")
+                    plt.close(fig)
+
+            output_div = web.page["output-popular-outcomes"]
+            if len(popoutcomes) == 0:
+                output_div.innerText = "No popular outcomes"
+            else:
+                df = pd.DataFrame(
+                    [[str(part) + ',' for part in partition[:-1]] + [str(partition[-1])] for partition in popoutcomes],
+                    columns=[f"Room {i+1}" for i in range(len(popoutcomes[0]))]
+                )
+                df.index.name = "Outcome"
+                display(df, target="output-popular-outcomes", append=False)
+
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
+
+
+@when("click", "#find-morepop-button")
+def find_more_popular_outcome(event):
+    """
+    Display a single matplotlib plot.
+    """
+    if settings["initialized"]:
+        if settings["valid"]:
+            # Compute all possible outcomes and find the popular ones
+            if not settings["already-computed"]:
+                settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
+                settings["outcomesAgentToRoomID"] = generateAgentsToRoomIdAllOutcomes(settings["outcomes"], range(settings["nrAgents"]))
+                settings["popoutcomesids"] = findPopularOutcomes(settings["outcomes"], settings["agentsCoordinates"], settings["outcomesAgentToRoomID"])
+                settings["already-computed"] = True
+
+            # Create the string for popular outcomes
+
+            input_text = web.page["manual-outcome-more-popularinput"]
+            test_outcome =  ast.literal_eval("\n".join(line.strip() for line in input_text.value.splitlines()))
+
+            test_agent_to_roomID = generateAgentsToRoomIdAllOutcomes([test_outcome], range(settings["nrAgents"]))[0]
+            morepopoutcomes = findMorePopular(test_outcome, settings["outcomes"], settings["agentsCoordinates"], test_agent_to_roomID, settings["outcomesAgentToRoomID"])
+
+
+            display(HTML("More Popular Outcomes"),
+                    target="more-popular-output", append=False)
+
+            output_div = web.page["more-popular-output"]
+            if len(morepopoutcomes) == 0:
+                output_div.innerText = "Input outcome is popular"
+            else:
+                df = pd.DataFrame(
+                    [[str(part) + ',' for part in partition[:-1]] + [str(partition[-1])] for partition in morepopoutcomes],
+                    columns=[f"Room {i+1}" for i in range(len(morepopoutcomes[0]))]
+                )
+                df.index.name = "Outcome"
+                display(df, target="more-popular-output", append=False)
+
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
+
+
+@when("click", "#manual-plot-button")
+def show_manual_matplotlib_plot(event):
+    if settings["initialized"]:
+
+        display(HTML("Manually Inputted Outcomes"),
+                target="manual-plot-output", append=False)
+                
+        input_text = web.page["manual-outcome-input"]
+
+        manualOutcomes =  ast.literal_eval("\n".join(line.strip() for line in input_text.value.splitlines()))
         if is1d(settings["agentsCoordinates"]) and settings["roomsize"] == 2:
-            for i in popoutcomesids:
-                fig = plotOutcome1DCurve(outcomes[i], settings["agentsCoordinates"], settings["nrAgents"])
-                display(fig, target="plot-output")
+            for outcome in manualOutcomes:
+                fig = plotOutcome1DCurve(outcome, settings["agentsCoordinates"], settings["nrAgents"])
+                display(fig, target="manual-plot-output")
                 plt.close(fig)
         else:
-            for i in popoutcomesids:
-                fig = plotOutcome(outcomes[i], settings["agentsCoordinates"], settings["nrAgents"])
-                display(fig, target="plot-output")
+            for outcome in manualOutcomes:
+                fig = plotOutcome(outcome, settings["agentsCoordinates"], settings["nrAgents"])
+                display(fig, target="manual-plot-output")
                 plt.close(fig)
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
 
-        output_div = web.page["output-popular-outcomes"]
-        if len(popoutcomesstring) == 0:
-            output_div.innerText = "No popular outcomes"
-        else:
-            output_div.innerText = popoutcomesstring
+
+@when("click", "#manual-distance-button")
+def show_distance_table(event):
+    if settings["initialized"]:
+                
+        input_text = web.page["manual-outcome-input"]
+
+        manualOutcomes =  ast.literal_eval("\n".join(line.strip() for line in input_text.value.splitlines()))
+        raw_data = generateOutcomeAgentDistanceTable(manualOutcomes)
+
+        df = pd.DataFrame.from_dict(raw_data, orient="index")
+        df.index.name = "Outcome"
+        df.columns = [f"Agent {i}" for i in df.columns]
+        display(df, target="manual-distance-output", append=False)
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
+
+
+
+
+
+@when("click", "#manual-rank-button")
+def show_rank_table(event):
+    if settings["initialized"]:
+                
+        input_text = web.page["manual-outcome-input"]
+
+        manualOutcomes =  ast.literal_eval("\n".join(line.strip() for line in input_text.value.splitlines()))
+        raw_data = []
+        
+        for outcome in manualOutcomes:
+            raw_data.append(outcomeAgentsRank(outcome, settings["agentsCoordinates"]))
+
+        df = pd.DataFrame(raw_data)
+        df.index.name = "Outcome"
+        df.columns = [f"Agent {i}" for i in df.columns]
+        display(df, target="manual-rank-output", append=False)
+    else:
+        web.page["error-output"].innerText = "Roommate Game not initialized"
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # if settings["valid"]:
+    #     # Compute all possible outcomes and find the popular ones
+    #     if not settings["already-computed"]:
+    #         settings["outcomes"] = part(range(settings["nrAgents"]), settings["nrRooms"])
+    #         settings["outcomesAgentToRoomID"] = generateAgentsToRoomIdAllOutcomes(settings["outcomes"], range(settings["nrAgents"]))
+    #         settings["popoutcomesids"] = findPopularOutcomes(settings["outcomes"], settings["agentsCoordinates"], settings["outcomesAgentToRoomID"])
+    #         settings["already-computed"] = True
+
+    

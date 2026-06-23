@@ -10,6 +10,11 @@
 
   </head>
   <body>
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading…</div>
+  </div>
+    
     <h1>Bruteforce Popular Outcome Computation for 2D Euclidean Roommates</h1>
     <div id="error-output" style="color: red; font-weight: bold;"></div>
     <div class="grid">
@@ -17,8 +22,9 @@
         <h1>Initialize Roommate Game</h1>
         <h2>General</h2>
         <h5>Room Size</h5>
-        <input style="height: 1em; width: 10%;" type="text" id="room-size" value="3"><br><br>
-        <h3>Manual</h3>
+        <input style="height: 1em; width: 10%;" type="text" id="room-size" value="3">
+        <br><br>
+        <h2>Manual</h2>
         <h5>Points</h5>
         <textarea style="height: 10em; width: 100%;" type="text" id="input">
 {0: [-5.9, 0.0],
@@ -31,8 +37,9 @@
 7: [7.8, -9.0],
 8: [9.5, -2.3]}
         </textarea>
-        <button id="manual-button">Manual</button><br><br>
-        <h3>Random</h3>
+        <button id="manual-button">Set Manually</button>
+        <br><br>
+        <h2>Random</h2>
         <h5>Maximum Coordinate Values</h5>
         X: <input style="height: 1em; width: 10%;" type="text" id="max-x" value="10">
         Y: <input style="height: 1em; width: 10%;" type="text" id="max-y" value="10">
@@ -40,30 +47,120 @@
         X: <input style="height: 1em; width: 10%;" type="text" id="min-x" value="-10">
         Y: <input style="height: 1em; width: 10%;" type="text" id="min-y" value="-10">
         <h5>Number of Agents</h5>
-        <input style="height: 1em; width: 10%;" type="text" id="number-of-agents" value="9"><br><br>
-        <button id="random-button">Random</button>
+        <input style="height: 1em; width: 10%;" type="text" id="number-of-agents" value="9">
+        <br><br>
+        <button id="random-button">Set Randomly</button>
       </div>
 
 
       <div class="panel">
         <h1>Roommate Game Plot</h1>
-        <div style="min-width: 95%;" id="input-plot-output" class="output"></div><br><br>
+        <h2>Plot</h2>
+        <div style="min-width: 95%;" class="output">
+          <div id="input-plot-output" class="dataframe">
+
+          </div>
+        </div>
+        <br><br>
         <h2>Coordinates</h2>
-        <div id="output"></div>
+        <div id="agent-coordinates-output" class="output"></div>
+      </div>
+
+    </div>
+
+    <div class="grid">
+
+      <div class="panel">
+        <h1>Generate Popular Outcomes</h1>
+        <button id="btn-plot">Generate</button>
+        <br><br>
+        <h2>Popular outcome plots</h2>
+        <div id="plot-output" class="output"></div>
+        <br><br>
+        <h2>Popular outcomes</h2>
+        <div class="output">
+          <div id="output-popular-outcomes"></div>
+        </div>
       </div>
 
 
       <div class="panel">
-        <h1>Generate Popular outcomes</h1>
-        <button id="btn-plot">Generate</button><br><br>
-        <h2>Popular outcome plots</h2>
-        <div id="plot-output" class="output"></div><br><br>
-        <h2>Popular outcomes</h2>
-        <div id="output-popular-outcomes"></div>
+        <h1>Find More Popular Outcome</h1>
+        <button id="find-morepop-button">Find More Popular</button>
+        <br><br>
+        <h2>Input Outcome</h2>
+        <textarea style="height: 10em; width: 100%;" type="text" id="manual-outcome-more-popularinput">
+[
+[0, 1, 2],
+[3, 4, 5],
+[6, 7, 8]
+]
+        </textarea>
+        <br><br>
+        <h2>More Popular Outcomes</h2>
+        <div id="more-popular-output"  class="output"></div>
       </div>
+
+    </div>
+
+
+
+    <div class="grid">
+
+
+      <div class="panel">
+        <h1>Plot Outcomes Manually</h1>
+        <h2>Input Outcomes</h2>
+        <textarea style="height: 10em; width: 100%;" type="text" id="manual-outcome-input">
+[
+[[0, 1, 2],
+[3, 4, 5],
+[6, 7, 8]],
+
+[[0, 2, 4],
+[1, 3, 5],
+[6, 7, 8]]
+]
+        </textarea>
+        <button id="manual-plot-button">Plot</button>
+        <button id="manual-rank-button">Generate Rank Table</button>
+        <button id="manual-distance-button">Generate Distance Table</button>
+        <br><br>
+        <h2>Manual Plots</h2>
+        <div id="manual-plot-output"  class="output"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Rank Table</h2>
+        <div id="manual-rank-output"  class="output"></div>
+        <br><br>
+        <h2>Distance Table</h2>
+        <div id="manual-distance-output"  class="output"></div>
+      </div>
+
     </div>
     *When the room size is 2 and all y-coordinates are 0, line intersections are avoided when drawing the popular outcomes.
 
     <script type="py" src="./main.py" config="./pyscript.json"></script>
+
+    <script>
+    // Show immediately.
+    window.addEventListener("DOMContentLoaded", () => {
+      const loading = document.getElementById("loading-screen");
+
+      function hideLoading() {
+        loading.classList.add("hidden");
+      }
+
+      // Hide only when PyScript is fully done.
+      window.addEventListener("py:all-done", hideLoading, { once: true });
+
+      // Optional fallback: if you want to hide after the first interpreter is ready,
+      // comment out the line above and use py:done / mpy:done instead.
+      // window.addEventListener("py:done", hideLoading, { once: true });
+      // window.addEventListener("mpy:done", hideLoading, { once: true });
+    });
+  </script>
+
   </body>
 </html>
