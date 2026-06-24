@@ -378,19 +378,25 @@ def show_matplotlib_plot(event):
                 popoutcomes.append(settings["outcomes"][i])
 
 
-            display(HTML("Popular Outcomes"),
+            display(HTML(""),
                     target="plot-output", append=False)
             
             if is1d(settings["agentsCoordinates"]) and settings["roomsize"] == 2:
+                index = 0
                 for i in settings["popoutcomesids"]:
                     fig = plotOutcome1DCurve(settings["outcomes"][i], settings["agentsCoordinates"], settings["nrAgents"])
+                    fig.suptitle("Outcome " + str(index), fontsize=12, fontweight='bold')
                     display(fig, target="plot-output")
                     plt.close(fig)
+                    index += 1
             else:
+                index = 0
                 for i in settings["popoutcomesids"]:
                     fig = plotOutcome(settings["outcomes"][i], settings["agentsCoordinates"], settings["nrAgents"])
+                    fig.suptitle("Outcome " + str(index), fontsize=12, fontweight='bold')
                     display(fig, target="plot-output")
                     plt.close(fig)
+                    index += 1
 
             output_div = web.page["output-popular-outcomes"]
             if len(popoutcomes) == 0:
@@ -460,22 +466,28 @@ def find_more_popular_outcome(event):
 def show_manual_matplotlib_plot(event):
     if settings["initialized"]:
 
-        display(HTML("Manually Inputted Outcomes"),
+        display(HTML(""),
                 target="manual-plot-output", append=False)
                 
         input_text = web.page["manual-outcome-input"]
 
         manualOutcomes =  ast.literal_eval("\n".join(line.strip() for line in input_text.value.splitlines()))
         if is1d(settings["agentsCoordinates"]) and settings["roomsize"] == 2:
+            index = 0
             for outcome in manualOutcomes:
                 fig = plotOutcome1DCurve(outcome, settings["agentsCoordinates"], settings["nrAgents"])
+                fig.suptitle("Outcome " + str(index), fontsize=12, fontweight='bold')
                 display(fig, target="manual-plot-output")
                 plt.close(fig)
+                index += 1
         else:
+            index = 0
             for outcome in manualOutcomes:
                 fig = plotOutcome(outcome, settings["agentsCoordinates"], settings["nrAgents"])
+                fig.suptitle("Outcome " + str(index), fontsize=12, fontweight='bold')
                 display(fig, target="manual-plot-output")
                 plt.close(fig)
+                index += 1
     else:
         web.page["error-output"].innerText = "Roommate Game not initialized"
 
