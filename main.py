@@ -97,6 +97,34 @@ def findPopularOutcomes(outcomes, agentCoordinates, agentToRoomId):
             popularIds.append(i)
     return popularIds
 
+
+# Tables of distance and rank that could be used for computation, but, since it could introduce bugs, are only used for displaying information
+def generateAllAgentRoomDistanceTable(agentCoordinates):
+    allRoommates = list(itertools.combinations(range(settings["nrAgents"]), settings["roomsize"]-1))
+    result = {}
+    for i in range(settings["nrAgents"]):
+        result[i] = {}
+        for roommatesTuple in allRoommates:
+            roommatesSetLabel = set(roommatesTuple)
+            roommatesSet = set(roommatesTuple)
+            roommatesSet.add(i)
+            if len(roommatesSet) == settings["roomsize"]:
+                result[i][str(roommatesSetLabel)] = distAgentToRoom(roommatesSet, i, agentCoordinates)
+
+    return result
+
+def generateAllAgentRoomRankTable(agentRoomDistanceTable):
+    result = {}
+    for i in range(settings["nrAgents"]):
+        result[i] = {}
+        # for roommates in agentRoomDistanceTable[i]:
+        sortedByDistRoommates = {k: v for k, v in sorted(agentRoomDistanceTable[i].items(), key=lambda item: item[1])}
+        sortedRoommates = list(sortedByDistRoommates.keys())
+        for j in range(len(sortedRoommates)):
+            result[i][str(sortedRoommates[j])] = j
+            
+    return result
+
 # Plotting functions
 def add_quadratic_arc(ax, x1, x2, level=0, base_height=0.6, span_scale=0.08,
                       level_scale=0.9, color="tab:orange", lw=2.5, zorder=1):
@@ -250,6 +278,8 @@ def N_aux(outcome1, outcome2, agentCoordinates):
     return result
 
 
+
+
 settings = {
     "initialized": False,
 
@@ -261,6 +291,9 @@ settings = {
     "nrRooms": -1,
     "agentsCoordinates": {},
     "valid": True,
+
+    "agentRoomDistanceTable": {},
+    "agentRoomRankTable": {},
     
     "already-computed": False,
     "outcomes": [],
@@ -338,6 +371,7 @@ def plot_input_manual(event):
 
     settings["nrRooms"] = int(settings["nrAgents"] / settings["roomsize"])
 
+    # Plot the points
     fig = plotPoints(settings["agentsCoordinates"], settings["nrAgents"])
     display(HTML("points"),
             target="input-plot-output", append=False)
@@ -345,6 +379,7 @@ def plot_input_manual(event):
     display(fig, target="input-plot-output")
     plt.close(fig)
 
+    # Display the data of the coordinates
     df = pd.DataFrame.from_dict(settings["agentsCoordinates"], orient="index", columns=["x", "y"])
     df.index.name = "Agent"
 
@@ -353,6 +388,22 @@ def plot_input_manual(event):
     output = web.page["agent-coordinates-output-raw"]
     output.innerText = ""
     output.innerText = str(settings["agentsCoordinates"])
+
+    # Create distance tables
+    settings["agentRoomDistanceTable"] = generateAllAgentRoomDistanceTable(settings["agentsCoordinates"])
+    df = pd.DataFrame.from_dict(settings["agentRoomDistanceTable"], orient='index').sort_index(axis=0).sort_index(axis=1)
+    df.index.name = "Agent"
+
+    display(df, target="input-distance-output", append=False)
+
+    # Create rank tables
+    settings["agentRoomRankTable"] = generateAllAgentRoomRankTable(settings["agentRoomDistanceTable"])
+    df = pd.DataFrame.from_dict(settings["agentRoomRankTable"], orient='index').sort_index(axis=0).sort_index(axis=1)
+    df = df.astype('Int64')
+    df.index.name = "Agent"
+
+    display(df, target="input-rank-output", append=False)
+
 
 
 @when("click", "#btn-plot")
