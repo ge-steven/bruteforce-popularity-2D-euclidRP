@@ -348,6 +348,21 @@ def plot_input_random(event):
     output.innerText = ""
     output.innerText = str(settings["agentsCoordinates"])
 
+    # Create distance tables
+    settings["agentRoomDistanceTable"] = generateAllAgentRoomDistanceTable(settings["agentsCoordinates"])
+    df = pd.DataFrame.from_dict(settings["agentRoomDistanceTable"], orient='index').sort_index(axis=0).sort_index(axis=1)
+    df.index.name = "Agent"
+
+    display(df, target="input-distance-output", append=False)
+
+    # Create rank tables
+    settings["agentRoomRankTable"] = generateAllAgentRoomRankTable(settings["agentRoomDistanceTable"])
+    df = pd.DataFrame.from_dict(settings["agentRoomRankTable"], orient='index').sort_index(axis=0).sort_index(axis=1)
+    df = df.astype('Int64')
+    df.index.name = "Agent"
+
+    display(df, target="input-rank-output", append=False)
+
 @when("click", "#manual-button")
 def plot_input_manual(event):
     """
