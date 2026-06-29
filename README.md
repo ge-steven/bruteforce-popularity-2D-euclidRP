@@ -45,6 +45,8 @@ Room size: 2
     5: [10.5, 0]
 }
 
+{0: [-4.00, 0.0], 1: [-2.94, 0.0], 2: [-2.43, 0.0], 3: [-1.85, 0.0], 4: [-1.53, 0.0], 5: [-0.05, 0.0], 6: [0.11, 0.0], 7: [0.18, 0.0], 8: [0.78, 0.0], 9: [4.04, 0.0]}
+
 ## In 1D consecutive matching (minimum sum of RANKS) is not guaranteed to be popular
 Room size: 2
 
