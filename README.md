@@ -33,7 +33,7 @@ Room size: 2
     7: [2, -5]
 }
 
-## In 1D consecutive matching (minimum sum of distances) is not guaranteed to be popular
+## In 1D consecutive matching (minimum sum of DISTANCES) is not guaranteed to be popular
 Room size: 2
 
 {
@@ -44,6 +44,11 @@ Room size: 2
     4: [6.5, 0],
     5: [10.5, 0]
 }
+
+## In 1D consecutive matching (minimum sum of RANKS) is not guaranteed to be popular
+Room size: 2
+
+{ 0: [0, 0], 1: [0.5, 0], 2: [7, 0], 3: [9, 0], 4: [9.5, 0], 5: [10.5, 0], 6: [11, 0], 7: [13, 0], 8: [20, 0], 9: [20.5, 0] }
 
 ## Other interesting ones in 1D
 Room size: 2
